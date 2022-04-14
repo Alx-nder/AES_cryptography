@@ -96,6 +96,7 @@ def reverse_lookup(byte):
 
 
 def multiply_by_2(v):
+    # leftshift
     s = v << 1
     s &= 0xff
     if (v & 128) != 0:
