@@ -330,28 +330,35 @@ def dec(key, data):
 
 
 if __name__ == "__main__":
-    with open('7.txt', 'r') as f:
-        data = f.read()
+    # with open('7.txt', 'r') as f:
+    #     data = f.read()
     import base64
-    print(data)
-    print("########################\n")
-    data = base64.b64decode(data.replace('\n',''))
-    print(data)
+    # print(data)
+    # print("########################\n")
+    # data = base64.b64decode(data.replace('\n',''))
+    # print(data)
 
-    print("########################\n")
-    key = b'YELLOW SUBMARINE'
-    d = dec(key, data)
-    print(d)
+    # print("########################\n")
+    # key = b'YELLOW SUBMARINE'
+    # d = dec(key, data)
+    # print(d)
 
-
+# utf = encode UNICODE string to binary stream like saying print(b'two words')
+#base64 = encode byte sequence to string
     print("########################\n")
     plaintext=b"sixteen char txt"
     key      =b"sixteen char key"
 
+    print(base64.b64encode(plaintext))
+    print("########################\n")
+
+    # print(plaintext)
+
     print(enc(key,plaintext))
     
-    print("########################\n")
-    print(base64.b64encode(enc(key,plaintext)))
+    print(enc(key,plaintext).hex())
+    # print("########################\n")
+    # print(base64.b64encode(enc(key,plaintext)).decode("utf-8"))
     
-    print("########################\n")
-    print(dec(key,enc(key,plaintext)))
+    # print("########################\n")
+    # print(dec(key,enc(key,plaintext)).decode('utf-8'))
