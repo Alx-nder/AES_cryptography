@@ -332,14 +332,25 @@ if __name__ == "__main__":
     with open('7.txt', 'r') as f:
         data = f.read()
     import base64
+    print(data)
+    print("########################\n")
     data = base64.b64decode(data.replace('\n',''))
+    print(data)
 
-
+    print("########################\n")
     key = b'YELLOW SUBMARINE'
     d = dec(key, data)
     print(d)
 
-# plaintext="sixteen char txt"
-# key      ="sixteen char key"
 
-# print(enc(key,plaintext))
+    print("########################\n")
+    plaintext=b"sixteen char txt"
+    key      =b"sixteen char key"
+
+    print(enc(key,plaintext))
+    
+    print("########################\n")
+    print(base64.b64encode(enc(key,plaintext)))
+    
+    print("########################\n")
+    print(dec(key,enc(key,plaintext)))
