@@ -1,5 +1,5 @@
 import aes
-
+'''
 #bitwise xor turns to binary first 
 a = 12
 b = 21
@@ -21,10 +21,17 @@ x=10
 y=8
 print(x&y)
 
-#bitwise or 
+#bitwise or  
 print(x|y)
 
 #bit wise leftshift binary number then add trailing zeros
-print(10<<2)
+print(10<<4)
 #rightshift 
 print(10>>2)
+'''
+
+#turns a hex(base 16) to a int
+print(int("a1",16))
+
+#returns a hex denoted by the leading 0x
+print(hex(161))
