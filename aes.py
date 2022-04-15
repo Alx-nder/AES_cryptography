@@ -1,3 +1,8 @@
+#!C:\Program Files\Python310\python.exe
+print("content-type: text/html;\n\n" )
+
+import cgi
+
 #https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
 
 # https://medium.com/wearesinch/building-aes-128-from-the-ground-up-with-python-8122af44ebf9
@@ -362,3 +367,9 @@ if __name__ == "__main__":
     
     # print("########################\n")
     # print(dec(key,enc(key,plaintext)).decode('utf-8'))
+
+
+## accept ajax body
+form=cgi.FieldStorage()
+username=form.getvalue("message_py")
+grand_list=load_user.main(username)
