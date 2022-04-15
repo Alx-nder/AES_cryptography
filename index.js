@@ -10,7 +10,8 @@ $("#encrypt").click(function(){
             data: {message_py:""},
             dataType:"text",
             success: function(data){
-                $('[name=encrypted]').val()=data;
+                alert("done");
+                // $('[name=encrypted]').val()=data;
             }
         })
     }
