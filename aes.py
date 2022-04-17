@@ -74,15 +74,6 @@ reverse_aes_sbox = [
 ]
 
 
-def print_grid(grid):
-    for row in grid:
-        for val in row:
-            h = hex(val)
-            if len(h) == 3:
-                h = '0x0' + h[2]
-            print('{} '.format(h), end='')
-        print()
-
 
 def lookup(byte):
     # to return the first 4 bits
@@ -167,25 +158,24 @@ def break_in_grids_of_16(input_string):
     outer_grid = []
     # iteration based on groups of 16 chars
     for i in range(len(input_string)//16):
-        b = input_string[i*16: i*16 + 16]
+        stream = input_string[i*16: i*16 + 16]
         grid = [[], [], [], []]
         for i in range(4):
             for j in range(4):
-                grid[i].append(b[i + j*4])
+                grid[i].append(stream[i + j*4])
         outer_grid.append(grid)
-    # print("\n", input_string,"as a matrix of binary numbers is", outer_grid,"\n")
+    print("\n", input_string,"as a matrix of binary numbers is", outer_grid,"\n")
     return outer_grid
 
 
 def expand_key(key, rounds):
 
-    rcon = [[1, 0, 0, 0]]
+    round_const = [[1, 0, 0, 0]]
 
     for _ in range(1, rounds):
-        rcon.append([rcon[-1][0]*2, 0, 0, 0])
-        if rcon[-1][0] > 0x80:
-            rcon[-1][0] ^= 0x11b
-
+        round_const.append([round_const[-1][0]*2, 0, 0, 0])
+        if round_const[-1][0] > 0x80:
+            round_const[-1][0] ^= 0x11b
     key_grid = break_in_grids_of_16(key)[0]
 
     for round in range(rounds):
@@ -195,8 +185,7 @@ def expand_key(key, rounds):
 
         last_column_sbox_step = [lookup(b) for b in last_column_rotate_step]
 
-        last_column_rcon_step = [last_column_sbox_step[i]
-                                 ^ rcon[round][i] for i in range(len(last_column_rotate_step))]
+        last_column_rcon_step = [last_column_sbox_step[i]^ round_const[round][i] for i in range(len(last_column_rotate_step))]
 
         for r in range(4):
             key_grid[r] += bytes([last_column_rcon_step[r]
@@ -205,8 +194,7 @@ def expand_key(key, rounds):
         # Three more columns to go
         for i in range(len(key_grid)):
             for j in range(1, 4):
-                key_grid[i] += bytes([key_grid[i][round*4+j]
-                                      ^ key_grid[i][round*4+j+3]])
+                key_grid[i] += bytes([key_grid[i][round*4+j]^ key_grid[i][round*4+j+3]])
 
     return key_grid
 
@@ -242,7 +230,7 @@ def enc(key, data):
 
     for round in range(1, 10):
         temp_grids = []
-# list comprehension 
+    # list comprehension 
         for grid in grids:
             sub_bytes_step = [[lookup(val) for val in row] for row in grid]
             shift_rows_step = [rotate_row_left(sub_bytes_step[i], i) for i in range(4)]
@@ -331,7 +319,7 @@ def dec(key, data):
 
     grids = temp_grids
 
-    # Just transform the grids back to bytes
+    # Just transform the grids back to bytes stream
     int_stream = []
     for grid in grids:
         for column in range(4):
@@ -342,37 +330,18 @@ def dec(key, data):
 
 
 if __name__ == "__main__":
-    # with open('7.txt', 'r') as f:
-    #     data = f.read()
     import base64
-    # print(data)
-    # print("########################\n")
-    # data = base64.b64decode(data.replace('\n',''))
-    # print(data)
 
-    # print("########################\n")
-    key = b'YELLOW SUBMARINE'
-    # d = dec(key, data)
-    # print(d)
-
+    key=b"sixteen char key"
+    
 # utf = encode UNICODE string to binary stream like saying print(b'two words')
-#base64 = encode byte sequence to latin character string; the equal sign (=) is used for padding; encode raw result of a cryptographic function
-    print("########################\n")
+#base64 = encode byte sequence(string of octects) to latin character string; the equal sign (=) is used for padding; encode raw result of a cryptographic function
+    # one character is 8 bits (in ascii)
     plaintext=b"sixteen char txt"
-    # key      =b"sixteen char key"
-
-    # print(base64.b64encode(plaintext))
-    # print("########################\n")
-
-    # print(plaintext)
-    # dectxt=base64.b64decode("i0k0IUIHvk21381vC0ixYDZxzY64+xx/RNID+iplgzq9PDZgjc8L7jMg+2+m")
-    # print(dec(key,dectxt))
-    encrpt=enc(key,plaintext)
-    print(encrpt)
+    # print(chr(plaintext[0]))      #use chr() to get the unicode of the byte-int
     
-    # print(enc(key,plaintext).hex())
+    print(bytes.fromhex(enc(key,plaintext).hex()))
+
+    # print(base64.b64encode(enc(key,plaintext)).decode("utf-8"))    
     # print("########################\n")
-    # print(base64.b64encode(enc(key,plaintext)).decode("utf-8"))
-    
-    # print("########################\n")
-    print(dec(key,encrpt).decode('utf-8'))
+    # print(dec(key,encrpt).decode('utf-8'))

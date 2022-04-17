@@ -43,7 +43,7 @@ print(text)
 binary_data = bytes([65, 66, 67])  # ASCII values for A, B, C
 text = binary_data.decode('utf-8')
 print(text)
-'''
+
 # Starting with a hex string you can unhexlify it to bytes
 deadbeef = binascii.unhexlify('DEADBEEF')
 print(deadbeef)
@@ -55,3 +55,20 @@ hex_data = binascii.hexlify(b'\x00\xff')  # Two bytes values 0 and 255
 # It may be necessary to decode it to a regular string
 text_string = hex_data.decode('utf-8')  # Result is string "00ff"
 print(text_string)
+'''
+
+
+a_byte = b'\xff'  # 255
+i = ord(a_byte)   # Get the integer value of the byte
+
+bin = "{0:b}".format(i) # binary: 11111111
+hex = "{0:x}".format(i) # hexadecimal: ff
+oct = "{0:o}".format(i) # octal: 377
+
+print(bin)
+print(hex)
+print(oct)
+
+plaintext=b"sixteen char txt"
+print(chr(plaintext[0]))      #use chr() to get the unicode of the byte-int
+    

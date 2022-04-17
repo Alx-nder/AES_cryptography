@@ -12,3 +12,7 @@ first we break the inout into a string of multipole 16
 then we reshape thaat list into a 4x4 matrix
 
 This is a simple lookup table, so we can just make two matrix and a function that access a position. The way to map a byte to this S-Box is to take the fist most significant nibble as the row, and the least significant nibble as the columns
+
+https://cryptographyinsimpleterms.wordpress.com/
+
+https://www.youtube.com/watch?v=gP4PqVGudtg
