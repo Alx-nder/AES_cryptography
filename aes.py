@@ -152,7 +152,7 @@ def add_sub_key(block_grid, key_grid):
 def extract_key_for_round(expanded_key, round):
     return [row[round*4: round*4 + 4] for row in expanded_key]
 
-
+# turns a list into a matrix
 def break_in_grids_of_16(s):
     all = []
     for i in range(len(s)//16):
@@ -202,7 +202,7 @@ def expand_key(key, rounds):
 def enc(key, data):
 
     # First we need to padd the data with \x00 and break it into blocks of 16
-
+# padding here
     pad = bytes(16 - len(data) % 16)
 
     if len(pad) != 16:
@@ -230,11 +230,10 @@ def enc(key, data):
 
     for round in range(1, 10):
         temp_grids = []
-
+# list comprehension 
         for grid in grids:
             sub_bytes_step = [[lookup(val) for val in row] for row in grid]
-            shift_rows_step = [rotate_row_left(
-                sub_bytes_step[i], i) for i in range(4)]
+            shift_rows_step = [rotate_row_left(sub_bytes_step[i], i) for i in range(4)]
             mix_column_step = mix_columns(shift_rows_step)
 
             round_key = extract_key_for_round(expanded_key, round)
