@@ -85,10 +85,20 @@ def print_grid(grid):
 
 
 def lookup(byte):
+    # to return the first 4 bits
     x = byte >> 4
+    #to reutn the last 4 bits    
     y = byte & 15
     return aes_sbox[x][y]
-
+# example
+# 219
+# 1101 1011
+# 1101
+# 13
+# 1101 1011
+# 0000 1111
+#      1011
+# 11
 
 def reverse_lookup(byte):
     x = byte >> 4
@@ -152,17 +162,19 @@ def add_sub_key(block_grid, key_grid):
 def extract_key_for_round(expanded_key, round):
     return [row[round*4: round*4 + 4] for row in expanded_key]
 
-# turns a list into a matrix
-def break_in_grids_of_16(s):
-    all = []
-    for i in range(len(s)//16):
-        b = s[i*16: i*16 + 16]
+# turns a list into a matrix 
+def break_in_grids_of_16(input_string):
+    outer_grid = []
+    # iteration based on groups of 16 chars
+    for i in range(len(input_string)//16):
+        b = input_string[i*16: i*16 + 16]
         grid = [[], [], [], []]
         for i in range(4):
             for j in range(4):
                 grid[i].append(b[i + j*4])
-        all.append(grid)
-    return all
+        outer_grid.append(grid)
+    # print("\n", input_string,"as a matrix of binary numbers is", outer_grid,"\n")
+    return outer_grid
 
 
 def expand_key(key, rounds):
@@ -202,7 +214,7 @@ def expand_key(key, rounds):
 def enc(key, data):
 
     # First we need to padd the data with \x00 and break it into blocks of 16
-# padding here
+    # padding here if necessary
     pad = bytes(16 - len(data) % 16)
 
     if len(pad) != 16:
@@ -339,26 +351,28 @@ if __name__ == "__main__":
     # print(data)
 
     # print("########################\n")
-    # key = b'YELLOW SUBMARINE'
+    key = b'YELLOW SUBMARINE'
     # d = dec(key, data)
     # print(d)
 
 # utf = encode UNICODE string to binary stream like saying print(b'two words')
-#base64 = encode byte sequence to string
+#base64 = encode byte sequence to latin character string; the equal sign (=) is used for padding; encode raw result of a cryptographic function
     print("########################\n")
     plaintext=b"sixteen char txt"
-    key      =b"sixteen char key"
+    # key      =b"sixteen char key"
 
-    print(base64.b64encode(plaintext))
-    print("########################\n")
+    # print(base64.b64encode(plaintext))
+    # print("########################\n")
 
     # print(plaintext)
-
-    print(enc(key,plaintext))
+    # dectxt=base64.b64decode("i0k0IUIHvk21381vC0ixYDZxzY64+xx/RNID+iplgzq9PDZgjc8L7jMg+2+m")
+    # print(dec(key,dectxt))
+    encrpt=enc(key,plaintext)
+    print(encrpt)
     
-    print(enc(key,plaintext).hex())
+    # print(enc(key,plaintext).hex())
     # print("########################\n")
     # print(base64.b64encode(enc(key,plaintext)).decode("utf-8"))
     
     # print("########################\n")
-    # print(dec(key,enc(key,plaintext)).decode('utf-8'))
+    print(dec(key,encrpt).decode('utf-8'))
