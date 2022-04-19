@@ -74,7 +74,7 @@ reverse_aes_sbox = [
 ]
 
 
-
+# funcntions to perform substitutions
 def lookup(byte):
     # to return the first 4 bits
     x = byte >> 4
@@ -91,63 +91,75 @@ def lookup(byte):
 #      1011
 # 11
 
+# funcntions to perform substitutions
 def reverse_lookup(byte):
     x = byte >> 4
     y = byte & 15
     return reverse_aes_sbox[x][y]
 
-
-def multiply_by_2(v):
-    # leftshift
-    s = v << 1
-    s &= 0xff
-    if (v & 128) != 0:
-        s = s ^ 0x1b
-    return s
-
-
-def multiply_by_3(v):
-    return multiply_by_2(v) ^ v
+# basically adds a 1 to the powers
+def multiply_by_2(num):
+    # leftshift adds a zero at end
+    result = num << 1
+    # this is to say num = num & 1111 1111 done to set particular bits to zero
+    result &= 0xff
+    # 128 is 2**7 or 8 bits 1000 0000
+    if (num & 128) != 0:
+        result = result ^ 0x1b
+    return result
 
 
+def multiply_by_3(num):
+    return multiply_by_2(num) ^ num
+
+# making new columns from the old ones multiplied by rijndael field
 def mix_columns(grid):
     new_grid = [[], [], [], []]
     for i in range(4):
+        # making a new col list
         col = [grid[j][i] for j in range(4)]
+        # rijndael' galois field multiplication on each column        
         col = mix_column(col)
         for i in range(4):
             new_grid[i].append(col[i])
     return new_grid
 
 
+
+# rijndael' galois field multiplication
+'''
+02 03 01 01 
+01 02 03 01
+01 01 02 03
+03 01 01 02
+'''
 def mix_column(column):
-    r = [
-        multiply_by_2(column[0]) ^ multiply_by_3(
-            column[1]) ^ column[2] ^ column[3],
-        multiply_by_2(column[1]) ^ multiply_by_3(
-            column[2]) ^ column[3] ^ column[0],
-        multiply_by_2(column[2]) ^ multiply_by_3(
-            column[3]) ^ column[0] ^ column[1],
-        multiply_by_2(column[3]) ^ multiply_by_3(
-            column[0]) ^ column[1] ^ column[2],
+    # rij_row[i] xor column[i]
+    new_mixed_column = [
+        multiply_by_2(column[0]) ^ multiply_by_3(column[1]) ^ column[2] ^ column[3],
+        multiply_by_2(column[1]) ^ multiply_by_3(column[2]) ^ column[3] ^ column[0],
+        multiply_by_2(column[2]) ^ multiply_by_3(column[3]) ^ column[0] ^ column[1],
+        multiply_by_2(column[3]) ^ multiply_by_3(column[0]) ^ column[1] ^ column[2]
     ]
-    return r
+    return new_mixed_column
 
 
 def rotate_row_left(row, n=1):
     return row[n:] + row[:n]
 
 
-def add_sub_key(block_grid, key_grid):
-    r = []
+def add_sub_key(plaintext_grid, key_grid):
+    round_cypher = []
 
     # 4 rows in the grid
     for i in range(4):
-        r.append([])
+        round_cypher.append([])
         # 4 values on each row
         for j in range(4):
-            r[-1].append(block_grid[i][j] ^ key_grid[i][j])
-    return r
+            # add to the last row 4 times
+            round_cypher[i].append(plaintext_grid[i][j] ^ key_grid[i][j])
+    # print("this is the cypher after a round: ", round_cypher )
+    return round_cypher
 
 
 def extract_key_for_round(expanded_key, round):
@@ -211,7 +223,6 @@ def enc(key, data):
     grids = break_in_grids_of_16(data)
 
     # Now we need to expand the key for the multiple rounds
-
     expanded_key = expand_key(key, 11)
 
     # And apply the original key to the blocks before start the rounds
@@ -232,8 +243,11 @@ def enc(key, data):
         temp_grids = []
     # list comprehension 
         for grid in grids:
+            # a new list from substituting in s box
             sub_bytes_step = [[lookup(val) for val in row] for row in grid]
+            # a new list with the rotations
             shift_rows_step = [rotate_row_left(sub_bytes_step[i], i) for i in range(4)]
+            # rijndael modulo
             mix_column_step = mix_columns(shift_rows_step)
 
             round_key = extract_key_for_round(expanded_key, round)
@@ -244,7 +258,6 @@ def enc(key, data):
         grids = temp_grids
 
     # A final round without the mix columns
-
     temp_grids = []
     round_key = extract_key_for_round(expanded_key, 10)
 
@@ -259,8 +272,7 @@ def enc(key, data):
 
     grids = temp_grids
 
-    # Just need to recriate the data into a single stream before returning
-
+    # recreate the data into a single stream before returning
     int_stream = []
     for grid in grids:
         for column in range(4):
@@ -340,7 +352,7 @@ if __name__ == "__main__":
     plaintext=b"sixteen char txt"
     # print(chr(plaintext[0]))      #use chr() to get the unicode of the byte-int
     
-    print(bytes.fromhex(enc(key,plaintext).hex()))
+    print((enc(key,plaintext).hex()))
 
     # print(base64.b64encode(enc(key,plaintext)).decode("utf-8"))    
     # print("########################\n")

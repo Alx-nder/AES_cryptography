@@ -55,7 +55,6 @@ hex_data = binascii.hexlify(b'\x00\xff')  # Two bytes values 0 and 255
 # It may be necessary to decode it to a regular string
 text_string = hex_data.decode('utf-8')  # Result is string "00ff"
 print(text_string)
-'''
 
 
 a_byte = b'\xff'  # 255
@@ -72,3 +71,30 @@ print(oct)
 plaintext=b"sixteen char txt"
 print(chr(plaintext[0]))      #use chr() to get the unicode of the byte-int
     
+'''
+def multiply_by_2(v):
+    # leftshift adds a zero at end
+    s = v << 1
+    # this is to say s = s & 1111 1111 done to set particular bits to zero
+    s &= 0xff
+    # 128 is 2**7 or 8 bits 1000 0000
+
+    # 101
+    # 0000 1010
+    # 1111 1111
+    # 0000 1010 
+ 
+
+    # 0000 0101
+    # 1000 0000
+    # 0000 0000
+
+    # 0000 1010 
+    # 0001 1011
+    # 0001 1010
+
+    if (v & 128) != 0:
+        s = s ^ 0x1b
+    return s
+
+print(multiply_by_2(0xa))
