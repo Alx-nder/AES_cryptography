@@ -96,5 +96,10 @@ def multiply_by_2(v):
     if (v & 128) != 0:
         s = s ^ 0x1b
     return s
+def rotate_row_left(row, n=1):
+    return row[n:] + row[:n]
 
-print(multiply_by_2(0xa))
+print(0x1b^0x11b)
+# 0000 0001 1011
+# 0001 0001 1011
+# 0001 0000 0000

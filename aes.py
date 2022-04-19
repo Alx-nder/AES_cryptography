@@ -126,7 +126,7 @@ def mix_columns(grid):
 
 
 
-# rijndael' galois field multiplication
+# rijndael' galois field multiplication predefined
 '''
 02 03 01 01 
 01 02 03 01
@@ -143,7 +143,7 @@ def mix_column(column):
     ]
     return new_mixed_column
 
-
+# everything from index 1 plus everything before index 1 the end
 def rotate_row_left(row, n=1):
     return row[n:] + row[:n]
 
@@ -176,32 +176,41 @@ def break_in_grids_of_16(input_string):
             for j in range(4):
                 grid[i].append(stream[i + j*4])
         outer_grid.append(grid)
-    print("\n", input_string,"as a matrix of binary numbers is", outer_grid,"\n")
+    # print("\n", input_string,"as a matrix of binary numbers is", outer_grid,"\n")
     return outer_grid
 
 
 def expand_key(key, rounds):
 
+#  round const  "0x01","0x02","0x04","0x08","0x10","0x20","0x40","0x80","0x1B","0x36"
+
     round_const = [[1, 0, 0, 0]]
 
     for _ in range(1, rounds):
-        round_const.append([round_const[-1][0]*2, 0, 0, 0])
+        round_const.append([ (round_const[-1][0]*2), 0, 0, 0])
         if round_const[-1][0] > 0x80:
+            # the multiply by two breaks here
             round_const[-1][0] ^= 0x11b
+            
+            # the [0] escapes the outer_grid since key is 16 char 
     key_grid = break_in_grids_of_16(key)[0]
 
     for round in range(rounds):
+        # make a list with  the last element of each row in key_grid
         last_column = [row[-1] for row in key_grid]
 
+        # rotate the first element to be the last 
         last_column_rotate_step = rotate_row_left(last_column)
 
+        # substitute elements with sbox
         last_column_sbox_step = [lookup(b) for b in last_column_rotate_step]
 
+        # xor the sub_step with the round const
         last_column_rcon_step = [last_column_sbox_step[i]^ round_const[round][i] for i in range(len(last_column_rotate_step))]
 
-        for r in range(4):
-            key_grid[r] += bytes([last_column_rcon_step[r]
-                                  ^ key_grid[r][round*4]])
+        # new grid col a xor the new_col with bytes - a set of 4 bytes
+        for i in range(4):
+            key_grid[i] += bytes([last_column_rcon_step[i]^ key_grid[i][round*4]])
 
         # Three more columns to go
         for i in range(len(key_grid)):
@@ -314,10 +323,8 @@ def dec(key, data):
             mix_column_step = mix_columns(add_sub_key_step)
             mix_column_step = mix_columns(mix_column_step)
             mix_column_step = mix_columns(mix_column_step)
-            shift_rows_step = [rotate_row_left(
-                mix_column_step[i], -1 * i) for i in range(4)]
-            sub_bytes_step = [
-                [reverse_lookup(val) for val in row] for row in shift_rows_step]
+            shift_rows_step = [rotate_row_left(mix_column_step[i], -1 * i) for i in range(4)]
+            sub_bytes_step = [[reverse_lookup(val) for val in row] for row in shift_rows_step]
             temp_grids.append(sub_bytes_step)
 
         grids = temp_grids
