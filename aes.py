@@ -77,7 +77,7 @@ reverse_aes_sbox = [
 # funcntions to perform substitutions
 def lookup(byte):
     # to return the first 4 bits
-    x = byte >> 4
+    x = byte >> 4 
     #to reutn the last 4 bits    
     y = byte & 15
     return aes_sbox[x][y]
@@ -147,7 +147,6 @@ def mix_column(column):
 def rotate_row_left(row, n=1):
     return row[n:] + row[:n]
 
-
 def add_sub_key(plaintext_grid, key_grid):
     round_cypher = []
 
@@ -211,12 +210,12 @@ def expand_key(key, rounds):
         # new grid col a xor the new_col with bytes - a set of 4 bytes
         for i in range(4):
             key_grid[i] += bytes([last_column_rcon_step[i]^ key_grid[i][round*4]])
-
+                
         # Three more columns to go
         for i in range(len(key_grid)):
             for j in range(1, 4):
                 key_grid[i] += bytes([key_grid[i][round*4+j]^ key_grid[i][round*4+j+3]])
-
+    # print(key_grid)
     return key_grid
 
 
@@ -304,10 +303,9 @@ def dec(key, data):
     for grid in grids:
 
         add_sub_key_step = add_sub_key(grid, round_key)
-        shift_rows_step = [rotate_row_left(
-            add_sub_key_step[i], -1 * i) for i in range(4)]
-        sub_bytes_step = [[reverse_lookup(val) for val in row]
-                          for row in shift_rows_step]
+        shift_rows_step = [rotate_row_left(add_sub_key_step[i], -1 * i) for i in range(4)]
+        sub_bytes_step = [[reverse_lookup(val) for val in row] for row in shift_rows_step]
+        
         temp_grids.append(sub_bytes_step)
 
     grids = temp_grids
@@ -323,6 +321,7 @@ def dec(key, data):
             mix_column_step = mix_columns(add_sub_key_step)
             mix_column_step = mix_columns(mix_column_step)
             mix_column_step = mix_columns(mix_column_step)
+
             shift_rows_step = [rotate_row_left(mix_column_step[i], -1 * i) for i in range(4)]
             sub_bytes_step = [[reverse_lookup(val) for val in row] for row in shift_rows_step]
             temp_grids.append(sub_bytes_step)
@@ -356,11 +355,11 @@ if __name__ == "__main__":
 # utf = encode UNICODE string to binary stream like saying print(b'two words')
 #base64 = encode byte sequence(string of octects) to latin character string; the equal sign (=) is used for padding; encode raw result of a cryptographic function
     # one character is 8 bits (in ascii)
-    plaintext=b"sixteen char txt"
+    plaintext=b"sixteen char txtiuhihihi"
     # print(chr(plaintext[0]))      #use chr() to get the unicode of the byte-int
     
-    print((enc(key,plaintext).hex()))
-
+    # print(enc(key,plaintext))
+    print(dec(key,b'\x17Q\xfd\xe0\xda\x1c\x900@J\x0e\xb3\x1d=%\xcc\xdc\xa07\x13\xeb\xdf0\x7fP\x85\x8bJ\x14c\xe6\xb7'))
     # print(base64.b64encode(enc(key,plaintext)).decode("utf-8"))    
     # print("########################\n")
-    # print(dec(key,encrpt).decode('utf-8'))
+    # print(dec(key,b'\x17Q\xfd\xe0\xda\x1c\x900@J\x0e\xb3\x1d=%\xcc'))

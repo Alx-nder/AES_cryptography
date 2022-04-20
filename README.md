@@ -16,3 +16,5 @@ This is a simple lookup table, so we can just make two matrix and a function tha
 https://cryptographyinsimpleterms.wordpress.com/
 
 https://www.youtube.com/watch?v=gP4PqVGudtg
+
+https://www.youtube.com/watch?v=w4aWIVhcUyo
