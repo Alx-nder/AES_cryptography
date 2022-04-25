@@ -1,6 +1,6 @@
-
+#credit
 #https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
-
+#
 # https://medium.com/wearesinch/building-aes-128-from-the-ground-up-with-python-8122af44ebf9
 
 aes_sbox = [
